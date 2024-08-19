@@ -8,13 +8,21 @@ const newItemHighPriority = ref(false)
 const editing = ref(false)
 
 function saveItem() {
-  items.value.push({id: items.value.length + 1, label: newItem.value})
+  items.value.push({
+    id: items.value.length + 1, 
+    label: newItem.value,
+    highPriority: newItemHighPriority.value
+  })
   newItem.value = ""
 }
 
 function doEdit(e) {
   editing.value = e
   newItem.value = ""
+}
+
+function togglePurchased(item) {
+  item.purchased = !item.purchased
 }
 
 </script>
@@ -32,11 +40,14 @@ function doEdit(e) {
       <input type="checkbox" v-model="newItemHighPriority" value=true>
       High Priority
     </label>
-    <button class="btn btn-primary">Save Item</button>
+    <button :disabled="newItem.length === 0" class="btn btn-primary">Save Item</button>
   </form>
 
   <ul>
-    <li v-for="{id, label} in items" :key="id">{{ label }}</li>
+    <li v-for="item in items" :key="item.id" @click="togglePurchased(item)" class="static-class"
+    :class="{ strikeout: item.purchased, priority: item.highPriority }">
+      {{ item.label }}
+    </li>
   </ul>
 
   <p v-if="!items.length">
