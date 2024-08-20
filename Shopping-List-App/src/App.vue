@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const header = ref('Shopping List App')
 const items = ref([])
@@ -14,6 +14,7 @@ function saveItem() {
     highPriority: newItemHighPriority.value
   })
   newItem.value = ""
+  newItemHighPriority.value = ""
 }
 
 function doEdit(e) {
@@ -25,6 +26,10 @@ function togglePurchased(item) {
   item.purchased = !item.purchased
 }
 
+const characterCount = computed(() => newItem.value.length)
+
+const reversedItems = computed(() => [...items.value].reverse())
+
 </script>
 
 <template>
@@ -35,7 +40,7 @@ function togglePurchased(item) {
   </div>
 
   <form v-if="editing" class="add-item-form" @submit.prevent="saveItem">
-    <input type="text" v-model="newItem" placeholder="Add a New Item">
+    <input type="text" v-model="newItem" placeholder="Add a New Item" maxlength="100">
     <label>
       <input type="checkbox" v-model="newItemHighPriority" value=true>
       High Priority
@@ -43,8 +48,12 @@ function togglePurchased(item) {
     <button :disabled="newItem.length === 0" class="btn btn-primary">Save Item</button>
   </form>
 
+  <p v-if="editing" class="counter">
+    {{ characterCount }}/100
+  </p>
+
   <ul>
-    <li v-for="item in items" :key="item.id" @click="togglePurchased(item)" class="static-class"
+    <li v-for="item in reversedItems" :key="item.id" @click="togglePurchased(item)" class="static-class"
     :class="{ strikeout: item.purchased, priority: item.highPriority }">
       {{ item.label }}
     </li>
